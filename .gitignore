@@ -205,3 +205,11 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# outros exercicios
+Estruturas de Dados e Algoritmos I
+Estruturas de Dados e Algoritmos II
+POO
+Exercicios solo
+pyproject.toml
+
