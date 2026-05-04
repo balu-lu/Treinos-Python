@@ -4,23 +4,19 @@ from pydantic import BaseModel
 app = FastAPI()
 
 
-class NovaTarefa(BaseModel):
+class Tarefa(BaseModel):
     nome: str
     descricao: str
+    concluida: bool = False
 
 
-tarefas = []
+tarefas: list[Tarefa] = []
 
 
 @app.post("/tarefas")
-def adicionar_tarefa(tarefa: NovaTarefa):
-    nova_tarefa_dict = {
-        "nome": tarefa.nome,
-        "descricao": tarefa.descricao,
-        "concluida": False
-    }
-    tarefas.append(nova_tarefa_dict)
-    return {"mensagem": "Tarefa adicionada com sucesso!", "tarefa": nova_tarefa_dict}
+def adicionar_tarefa(tarefa: Tarefa):
+    tarefas.append(tarefa)
+    return {"mensagem": "Tarefa adicionada com sucesso!", "tarefa": tarefa}
 
 
 @app.get("/tarefas")
@@ -30,17 +26,17 @@ def listar_tarefas():
 
 @app.put("/tarefas/{nome_da_tarefa}")
 def concluir_tarefa(nome_da_tarefa: str):
-    for tarefa in tarefas:
-        if tarefa["nome"] == nome_da_tarefa:
-            tarefa["concluida"] = True
-            return {"mensagem": "Tarefa marcada como concluída!", "tarefa": tarefa}
+    for t in tarefas:
+        if t.nome == nome_da_tarefa:
+            t.concluida = True
+            return {"mensagem": "Tarefa marcada como concluída!", "tarefa": t}
     raise HTTPException(status_code=404, detail="Tarefa não encontrada.")
 
 
 @app.delete("/tarefas/{nome_da_tarefa}")
 def remover_tarefa(nome_da_tarefa: str):
-    for i, tarefa in enumerate(tarefas):
-        if tarefa["nome"] == nome_da_tarefa:
+    for i, t in enumerate(tarefas):
+        if t.nome == nome_da_tarefa:
             del tarefas[i]
             return {"mensagem": f"Tarefa '{nome_da_tarefa}' removida com sucesso!"}
     raise HTTPException(status_code=404, detail="Tarefa não encontrada.")
