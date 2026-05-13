@@ -1,9 +1,25 @@
 version: '3.8'
 
 services:
-  pokedex:
+  redis:
+    image: redis:7-alpine
+    container_name: redis_cache
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  api_livros:
     build: .
     ports:
       - "8000:8000"
-    volumes:
-      - ./PokeDex:/app/PokeDex
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 0
+    depends_on:
+      redis:
+        condition: service_healthy
