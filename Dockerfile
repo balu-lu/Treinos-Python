@@ -1,7 +1,6 @@
 FROM python:3.13-slim
 
 ENV PYTHONUNBUFFERED=1
-ENV POETRY_VERSION=1.8.3
 ENV POETRY_HOME=/opt/poetry
 ENV PATH="$POETRY_HOME/bin:$PATH"
 
@@ -13,7 +12,7 @@ WORKDIR /app
 
 COPY pyproject.toml poetry.lock ./
 
-RUN poetry install --no-dev --no-interaction --no-ansi
+RUN poetry install --only main --no-root --no-interaction --no-ansi
 
 COPY APIs/ ./APIs/
 

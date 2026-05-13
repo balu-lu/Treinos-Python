@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "cursoebac"
+name = "api-livros"
 version = "0.1.0"
-description = ""
+description = "FastAPI application for books management with Redis caching"
 authors = ["balu <daniel.pf.chs@gmail.com>"]
 
 [tool.poetry.dependencies]
