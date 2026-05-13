@@ -4,6 +4,7 @@ Template para adicionar mais testes à medida que sua API cresce.
 Copie este arquivo como referência quando adicionar novos endpoints.
 """
 
+from app import app, Livro, LivroInput
 import sys
 import os
 import pytest
@@ -11,8 +12,6 @@ from fastapi.testclient import TestClient
 from unittest.mock import patch, AsyncMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'APIs'))
-
-from app import app, Livro, LivroInput
 
 
 @pytest.fixture

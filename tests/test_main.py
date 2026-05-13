@@ -5,6 +5,7 @@ Utiliza o TestClient do FastAPI para fazer requisições sem precisar
 de um servidor rodando. Redis será mockado para testes sem dependências externas.
 """
 
+from app import app, Livro, LivroInput
 import sys
 import os
 import pytest
@@ -15,7 +16,6 @@ from unittest.mock import patch, AsyncMock
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'APIs'))
 
 # Importa a aplicação FastAPI
-from app import app, Livro, LivroInput
 
 
 @pytest.fixture
@@ -51,19 +51,21 @@ class TestEndpointLivros:
         quando Redis está disponível (simulado).
         """
         import json
-        
+
         with patch('app.obter_conexao_redis', new_callable=AsyncMock) as mock_redis:
             # Simula Redis disponível com dados em cache
             mock_redis_instance = AsyncMock()
             mock_redis_instance.ping.return_value = True
-            
+
             # Mocka o método .get() para retornar dados em JSON
             livros_json = json.dumps([
-                {"id": 1, "titulo": "O Senhor dos Anéis", "autor": "J.R.R. Tolkien", "ano": 1954, "disponivel": True},
-                {"id": 2, "titulo": "1984", "autor": "George Orwell", "ano": 1949, "disponivel": True}
+                {"id": 1, "titulo": "O Senhor dos Anéis",
+                    "autor": "J.R.R. Tolkien", "ano": 1954, "disponivel": True},
+                {"id": 2, "titulo": "1984", "autor": "George Orwell",
+                    "ano": 1949, "disponivel": True}
             ], ensure_ascii=False)
             mock_redis_instance.get.return_value = livros_json
-            
+
             mock_redis.return_value = mock_redis_instance
 
             response = client.get("/livros")
