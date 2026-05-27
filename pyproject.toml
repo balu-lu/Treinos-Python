@@ -3,6 +3,7 @@ name = "api-livros"
 version = "0.1.0"
 description = "FastAPI application for books management with Redis caching"
 authors = ["balu <daniel.pf.chs@gmail.com>"]
+packages = [{ include = "APIs" }]
 
 [tool.poetry.dependencies]
 python = "^3.13"
