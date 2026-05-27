@@ -17,7 +17,6 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Set up Python ${{ matrix.python-version }}
-        id: setup-python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
@@ -52,17 +51,20 @@ jobs:
           name: codecov-umbrella
           fail_ci_if_error: false
 
-  build-and-test-docker:
+  build-docker:
     runs-on: ubuntu-latest
     needs: test
+    env:
+      IMAGE_NAME: fastapi-app:latest
+      CONTAINER_NAME: fastapi-app-ci
     steps:
       - uses: actions/checkout@v3
 
       - name: Build Docker Image
-        run: docker build -t api-livros:latest .
+        run: docker build -t "$IMAGE_NAME" .
 
-      - name: Start Services with Docker Compose
-        run: docker compose up -d --no-build
+      - name: Run Docker Container
+        run: docker run -d --name "$CONTAINER_NAME" -p 8000:8000 "$IMAGE_NAME"
 
       - name: Wait for API to be ready
         run: |
@@ -77,7 +79,7 @@ jobs:
           done
 
           echo "API did not become ready in time"
-          docker compose logs
+          docker logs "$CONTAINER_NAME" || true
           exit 1
 
       - name: Smoke Test - Check API Endpoint
@@ -86,6 +88,7 @@ jobs:
           echo "HTTP Response Code: $response_code"
           if [ "$response_code" != "200" ]; then
             echo "Health check failed! Expected 200, got $response_code"
+            docker logs "$CONTAINER_NAME" || true
             exit 1
           fi
           echo "Health check passed!"
@@ -93,11 +96,11 @@ jobs:
       - name: Show Docker Logs (on failure)
         if: failure()
         run: |
-          echo "=== Docker Compose Logs ===="
-          docker compose logs
+          echo "=== Docker Logs ==="
+          docker logs "$CONTAINER_NAME" || true
 
-      - name: Cleanup - Stop services
+      - name: Cleanup - Stop container
         if: always()
         run: |
-          docker compose down
-          echo "Services cleaned up"
+          docker rm -f "$CONTAINER_NAME" || true
+          echo "Container cleaned up"
