@@ -63,7 +63,7 @@ async def obter_conexao_redis() -> redis.Redis:
         # Testa a conexão
         await r.ping()
         return r
-    except ConnectionError as e:
+    except (redis.ConnectionError, ConnectionError, OSError) as e:
         logger.warning("Falha ao conectar ao Redis: %s", e)
         return None
 
